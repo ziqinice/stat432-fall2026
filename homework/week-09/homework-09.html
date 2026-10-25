@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STAT 432 Homework 09</title>
+<style>
+  :root { color-scheme: light; --ink:#192b35; --muted:#526771; --teal:#147388; --line:#cbd9de; --pale:#e7f2f4; }
+  * { box-sizing:border-box; }
+  body { max-width:900px; margin:0 auto; padding:34px 38px 58px; color:var(--ink);
+          font:11pt/1.34 Arial,Helvetica,sans-serif; background:white; }
+  header { border-bottom:1px solid var(--line); margin-bottom:17px; padding-bottom:10px; }
+  h1 { font-size:19pt; line-height:1.13; margin:0 0 5px; border-left:5px solid var(--teal); padding-left:11px; }
+  .subtitle { color:var(--muted); font-size:9pt; margin:0; }
+  h2 { font-size:12pt; margin:16px 0 6px; }
+  p { margin:7px 0; }
+  table { width:100%; border-collapse:collapse; font-size:10pt; margin:12px 0 10px; }
+  th { background:var(--pale); border-bottom:1px solid var(--teal); text-align:left; }
+  th,td { padding:4px 7px; }
+  tbody tr:nth-child(even) { background:#f6f8f9; }
+  tr.selected { background:#d7edf0 !important; font-weight:bold; }
+  .q1-table th:nth-child(2),.q1-table td:nth-child(2) { width:110px; }
+  .q1-table th:nth-child(3),.q1-table td:nth-child(3) { width:260px; }
+  .q2-table { font-size:11pt; margin:7px 0 10px; }
+  .q2-table th,.q2-table td { padding:2px 6px; }
+  .comparison { width:100%; height:77px; display:block; margin:5px 0 2px; }
+  .comparison text { font:11px Arial,Helvetica,sans-serif; fill:var(--ink); }
+  figcaption { color:var(--muted); font-size:9pt; }
+  figure { margin:9px 0; }
+  pre { white-space:pre-wrap; overflow-wrap:anywhere; font:8.5pt/1.35 Menlo,Consolas,monospace;
+         background:#f6f8f9; border:1px solid var(--line); padding:12px; }
+  section { margin-bottom:30px; }
+  @page { size:letter; margin:0.52in; }
+  @media print {
+    body { max-width:none; padding:0; margin:0; }
+    section.question-2, section.appendix { break-before:page; page-break-before:always; }
+    section.question-2 { break-after:page; page-break-after:always; }
+    section { margin-bottom:0; }
+    table { break-inside:avoid; }
+    tr { break-inside:avoid; }
+    .q1-table { font-size:8.5pt; }
+    .q1-table th,.q1-table td { padding:3px 6px; }
+    .q2-table { font-size:11pt; }
+    .q2-table th,.q2-table td { padding:2px 6px; }
+  }
+</style>
+</head>
+<body>
+<section class="question-1">
+<header><h1>Question 1 | Choosing an SVM kernel</h1><p class="subtitle">Python 3.9 · scikit-learn 1.3.2 · all 462 SAheart observations</p></header>
+<p><b>Data and design.</b> Predict CHD (160 yes, 302 no) from the nine assigned predictors; code family history as Absent = 1 and Present = 2. There are no missing values. I assigned each class to five folds by shuffling with NumPy seed 432 and cycling through fold IDs. Fold sizes are 93, 93, 92, 92, 92, with 32 CHD cases in every fold. The same folds serve all 20 predeclared candidates. A scaler is fitted only on each fold's training rows.</p>
+<p><b>Fixed settings.</b> SVC defaults otherwise; polynomial kernels use gamma = 1/9 and coef0 = 1. The table reports mean five-fold misclassification. C, degree, and RBF gamma vary as listed.</p>
+<table class="q1-table"><thead><tr><th>Kernel / setting</th><th>Mean CV error</th><th>Fold errors (1–5)</th></tr></thead><tbody>
+<tr><td>linear C=0.1</td><td>0.281</td><td>0.323, 0.280, 0.239, 0.272, 0.293</td></tr>
+<tr><td>linear C=1</td><td>0.281</td><td>0.323, 0.280, 0.239, 0.272, 0.293</td></tr>
+<tr><td>linear C=10</td><td>0.277</td><td>0.323, 0.280, 0.239, 0.250, 0.293</td></tr>
+<tr><td>poly d=2 C=0.1</td><td>0.279</td><td>0.258, 0.290, 0.261, 0.283, 0.304</td></tr>
+<tr><td>poly d=2 C=1</td><td>0.271</td><td>0.247, 0.312, 0.228, 0.283, 0.283</td></tr>
+<tr><td>poly d=2 C=10</td><td>0.275</td><td>0.237, 0.290, 0.250, 0.261, 0.337</td></tr>
+<tr class="selected"><td>poly d=3 C=0.1</td><td>0.268</td><td>0.247, 0.269, 0.239, 0.304, 0.283</td></tr>
+<tr><td>poly d=3 C=1</td><td>0.288</td><td>0.269, 0.290, 0.272, 0.293, 0.315</td></tr>
+<tr><td>poly d=3 C=10</td><td>0.338</td><td>0.376, 0.333, 0.337, 0.272, 0.370</td></tr>
+<tr><td>poly d=4 C=0.1</td><td>0.268</td><td>0.237, 0.280, 0.250, 0.293, 0.283</td></tr>
+<tr><td>poly d=4 C=1</td><td>0.301</td><td>0.301, 0.312, 0.272, 0.272, 0.348</td></tr>
+<tr><td>poly d=4 C=10</td><td>0.351</td><td>0.344, 0.290, 0.402, 0.315, 0.402</td></tr>
+<tr><td>RBF C=0.1 gamma=0.001</td><td>0.346</td><td>0.344, 0.344, 0.348, 0.348, 0.348</td></tr>
+<tr><td>RBF C=0.1 gamma=0.01</td><td>0.346</td><td>0.344, 0.344, 0.348, 0.348, 0.348</td></tr>
+<tr><td>RBF C=0.1 gamma=0.1</td><td>0.346</td><td>0.344, 0.344, 0.348, 0.348, 0.348</td></tr>
+<tr><td>RBF C=0.1 gamma=1</td><td>0.346</td><td>0.344, 0.344, 0.348, 0.348, 0.348</td></tr>
+<tr><td>RBF C=1 gamma=0.001</td><td>0.346</td><td>0.344, 0.344, 0.348, 0.348, 0.348</td></tr>
+<tr><td>RBF C=1 gamma=0.01</td><td>0.275</td><td>0.269, 0.301, 0.250, 0.283, 0.272</td></tr>
+<tr><td>RBF C=1 gamma=0.1</td><td>0.290</td><td>0.258, 0.301, 0.272, 0.304, 0.315</td></tr>
+<tr><td>RBF C=1 gamma=1</td><td>0.346</td><td>0.376, 0.301, 0.348, 0.337, 0.370</td></tr>
+</tbody></table>
+<p><b>Choice.</b> Degree-3 polynomial with C = 0.1 has the lowest mean error (0.268, about 26.8%). Degree 4 with C = 0.1 ties at the displayed precision, so I prefer the lower-degree model. The best linear candidate is 0.277; the best RBF candidate is 0.275. These small gaps are uncertain because this is one fold split.</p>
+</section>
+<section class="question-2">
+<header><h1>Question 2 | SVM skill applied</h1><p class="subtitle">One-page analysis report · 11-point body and table text</p></header>
+<p><b>Data and suitability.</b> This binary classification task has 462 complete rows, nine numeric predictors after family-history coding (Absent = 1; Present = 2), and 160 CHD cases. The sample supports an SVM comparison, although class imbalance makes CHD recall important. A linear kernel tests a simple boundary; RBF allows curvature. I kept this skill run to those two kernels to limit tuning and make selection stable.</p>
+<p><b>Evaluation.</b> Stratified 25% test holdout (seed 432): 346 training and 116 test rows. The 12 settings below were fixed before fitting. On training rows only, I ran stratified five-fold CV three times (seeds 432, 433, 434), re-fitting the scaler in each training fold. Each run reused its folds for all candidates.</p>
+<figure><b>Figure 1. Best CV error by kernel</b><svg class="comparison" viewBox="0 0 520 84" role="img" aria-label="Best mean cross-validation error by kernel"><text x="0" y="35">Linear C=0.1</text><rect x="168" y="22" width="168.7" height="16" fill="#147388"/><text x="343.7" y="35">0.270</text><text x="0" y="67">RBF C=10, γ=0.01</text><rect x="168" y="54" width="165.1" height="16" fill="#82929e"/><text x="340.1" y="67">0.264</text></svg><figcaption>Bars show the mean of three five-fold CV runs; the table gives every candidate.</figcaption></figure>
+<table class="q2-table"><thead><tr><th>Kernel</th><th>C</th><th>gamma</th><th>Mean CV error</th><th>Repeat SD</th></tr></thead><tbody>
+<tr class="selected"><td>linear</td><td>0.1</td><td>—</td><td>0.270</td><td>0.022</td></tr>
+<tr><td>linear</td><td>1</td><td>—</td><td>0.278</td><td>0.019</td></tr>
+<tr><td>linear</td><td>10</td><td>—</td><td>0.279</td><td>0.023</td></tr>
+<tr><td>RBF</td><td>0.1</td><td>0.01</td><td>0.347</td><td>0.000</td></tr>
+<tr><td>RBF</td><td>0.1</td><td>0.1</td><td>0.347</td><td>0.000</td></tr>
+<tr><td>RBF</td><td>0.1</td><td>1</td><td>0.347</td><td>0.000</td></tr>
+<tr><td>RBF</td><td>1</td><td>0.01</td><td>0.285</td><td>0.002</td></tr>
+<tr><td>RBF</td><td>1</td><td>0.1</td><td>0.283</td><td>0.015</td></tr>
+<tr><td>RBF</td><td>1</td><td>1</td><td>0.353</td><td>0.006</td></tr>
+<tr><td>RBF</td><td>10</td><td>0.01</td><td>0.264</td><td>0.016</td></tr>
+<tr><td>RBF</td><td>10</td><td>0.1</td><td>0.314</td><td>0.020</td></tr>
+<tr><td>RBF</td><td>10</td><td>1</td><td>0.386</td><td>0.004</td></tr>
+</tbody></table>
+<p><b>Selection and test.</b> The minimum CV error is 0.264 (RBF, C = 10, gamma = 0.01). Its repeat-based one-SE cutoff is 0.273; the simpler linear C = 0.1 model qualifies (CV error 0.270) and is selected. After refitting, test error is 0.259 (30/116). Confusion matrix [actual no/yes × predicted no/yes] = [[65, 11], [19, 21]]. Recall is 85.5% for no CHD and 52.5% for CHD; 19 of 40 CHD cases are missed. This one holdout gives a noisy error estimate and missed cases may be consequential.</p>
+</section>
+<section class="appendix">
+<header><h1>Appendix | Complete SKILL.md</h1><p class="subtitle">Outside the one-page analysis limit</p></header>
+<p><b>Peer feedback used.</b> My Homework 7 reviewer asked for a defined near-tie rule, a reproducible candidate grid, and checks across fold seeds. My Homework 8 review highlighted compact reporting and missed-CHD sensitivity. The skill below incorporates these points.</p>
+<p><b>Explicit invocation.</b> Follow <code>homework/week-09/SKILL.md</code> to analyze <code>saheart.csv</code> with response CHD and predictors sbp, tobacco, ldl, adiposity, famhist, typea, obesity, alcohol, and age. Code famhist as Absent = 1 and Present = 2. Use Python; let the skill choose the remaining analysis and report design.</p>
+<pre>---
+name: svm-analysis
+description: Fit, compare, and report support vector machine classifiers when explicitly invoked with a dataset, response, and predictors.
+---
+
+# SVM analysis
+
+Use this skill only when the user explicitly names this file. The invocation must supply the dataset, response, predictors, and any required coding.
+
+1. Check sample size, class balance, missingness, predictor types, and whether classification with an SVM is suitable. Explain any exclusions or encoding.
+2. Reserve a stratified 25% test set with seed 432. Never use it to choose features, preprocessing, kernels, or settings.
+3. Compare a linear kernel as a baseline and an RBF kernel for nonlinear structure. Add a polynomial kernel only when the problem gives a reason; explain the kernel choices.
+4. Standardize numeric predictors and encode categories using training data only, refitting preprocessing inside every cross-validation fold.
+5. Before fitting, declare the complete candidate grid: linear $C\in\{0.1,1,10\}$; RBF $C\in\{0.1,1,10\}$ and $\gamma\in\{0.01,0.1,1\}$. If polynomial is justified, state its degree, $C$, $\gamma$, and `coef0` candidates in advance and cap the total at 20.
+6. On the training set, use stratified five-fold cross-validation with seeds 432, 433, and 434. Reuse each seed&#x27;s folds for all candidates. Compare mean misclassification rates; also report their variation across repeats.
+7. Select the simplest candidate within one standard error of the minimum repeated-fold mean error: linear before polynomial before RBF, then smaller $C$, degree, and $\gamma$. State this rule and the selected settings.
+8. Refit once on the full training set. Evaluate once on the reserved test set. Report test error, confusion matrix, and per-class recall; discuss consequential missed cases.
+9. Produce a compact figure and table that make the comparison and final choice checkable. Include sample counts, seed, fold design, key numerical results, and limits of the estimate.
+10. Put the evidence needed to justify the final model in no more than one printed page at 11-point font. Check the rendered page count; put code and detailed calculations outside that page.
+</pre>
+</section>
+</body>
+</html>
